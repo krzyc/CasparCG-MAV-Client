@@ -82,6 +82,8 @@ private slots:
     void on_btnSave_clicked();
     void on_btnSaveAs_clicked();
 
+    void on_btnSub50_clicked();
+
 public slots:
     void onTcpStateChanged(QAbstractSocket::SocketState socketState);
     void readyRead();

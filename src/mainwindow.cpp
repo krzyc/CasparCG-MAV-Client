@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&listener, SIGNAL(messageAvailable(QStringList,QStringList)),
             this, SLOT(processOsc(QStringList,QStringList)));
 
-    udp.bind(QHostAddress::AnyIPv4, 6250);
+    udp.bind(QHostAddress::Any, 6250);
     connect(&udp, SIGNAL(readyRead()),
             this, SLOT(readyRead()));
 
@@ -321,7 +321,7 @@ void MainWindow::setSpeed(float speed)
         if (ui->chkUpdateStart->isChecked())
         {
            command = "CALL " + ui->edtChannel->text() + "-" + ui->edtLayer->text() +
-                   " SEEK " + QString::number(ui->spnPlayStart->value()) +
+                   " SEEK " + QString::number(speed < 0 ? ui->spnPlayEnd->value() : ui->spnPlayStart->value()) +
                    "\r\n";
            tcp.write(command.toUtf8());
            command = "CALL " + ui->edtChannel->text() + "-" + ui->edtLayer->text() +
@@ -515,4 +515,9 @@ void MainWindow::saveConfig(QString fileName)
         ui->btnSave->setEnabled(true);
     }
     log("configSavedAs("+fileName+")");
+}
+
+void MainWindow::on_btnSub50_clicked()
+{
+    ui->spnPlayStart->setValue(ui->spnPlayStart->value()-50);
 }
