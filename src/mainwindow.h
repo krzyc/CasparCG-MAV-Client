@@ -84,6 +84,16 @@ private slots:
 
     void on_btnSub50_clicked();
 
+    void on_chkAudio_toggled(bool checked);
+
+    void on_btnSpeedN1_clicked();
+
+    void on_vslSpeed_sliderMoved(int position);
+
+    void on_vslSpeed_sliderPressed();
+
+    void on_vslSpeed_sliderReleased();
+
 public slots:
     void onTcpStateChanged(QAbstractSocket::SocketState socketState);
     void readyRead();
@@ -106,6 +116,7 @@ private:
     int recordFps, recordRealFps;
 
     bool playPlaying;
+    bool sliderPressed;
     int playCurFrame, playLastFrame, playCurVFrame, playLastVFrame, playFps;
     float playSpeed;
     QString playPath;

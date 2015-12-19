@@ -136,7 +136,11 @@ void MainWindow::processOsc(QStringList address, QStringList values)
     else if (adr == "channel/" + ui->edtChannel->text() + "/stage/layer/" + ui->edtLayer->text() + "/file/path")
         playPath = values[0];
     else if (adr == "channel/" + ui->edtChannel->text() + "/stage/layer/" + ui->edtLayer->text() + "/file/speed")
+    {
         playSpeed = values[0].toFloat();
+        if (!sliderPressed && playSpeed != ui->vslSpeed->value()/10)
+            ui->vslSpeed->setValue(playSpeed*10);
+    }
     else if (adr == "channel/" + ui->edtChannel->text() + "/stage/layer/" + ui->edtLayer->text() + "/file/frame")
     {
         playCurFrame = values[0].toInt();
@@ -337,10 +341,11 @@ void MainWindow::setSpeed(float speed)
         command = "PLAY " + ui->edtChannel->text() + "-" + ui->edtLayer->text() + " " +
                 ui->edtFile->text() +
                 " SPEED " + QString::number(speed) +
-                " SEEK " + ui->spnPlayStart->text() +
+                " SEEK " + QString::number(speed < 0 ? ui->spnPlayEnd->value() : ui->spnPlayStart->value()) +
                 (ui->chkStopAtEnd->isChecked()
                         ? " LENGTH " + QString::number(ui->spnPlayEnd->value() - ui->spnPlayStart->value())
                         : "") +
+                (ui->chkAudio->isChecked() ? " AUDIO 1" : "") +
                 "\r\n";
         tcp.write(command.toUtf8());
     }
@@ -520,4 +525,40 @@ void MainWindow::saveConfig(QString fileName)
 void MainWindow::on_btnSub50_clicked()
 {
     ui->spnPlayStart->setValue(ui->spnPlayStart->value()-50);
+}
+
+void MainWindow::on_chkAudio_toggled(bool checked)
+{
+    if (playPlaying)
+    {
+        QString command;
+        command = "CALL " + ui->edtChannel->text() + "-" + ui->edtLayer->text() +
+                " AUDIO " + (checked ? "1" : "0") +
+                "\r\n";
+        tcp.write(command.toUtf8());
+    }
+}
+
+void MainWindow::on_btnSpeedN1_clicked()
+{
+    setSpeed(-1);
+}
+
+void MainWindow::on_vslSpeed_sliderMoved(int position)
+{
+    QString command;
+    command = "CALL " + ui->edtChannel->text() + "-" + ui->edtLayer->text() +
+            " SPEED " + QString::number((double)ui->vslSpeed->value()/10) +
+            "\r\n";
+    tcp.write(command.toUtf8());
+}
+
+void MainWindow::on_vslSpeed_sliderPressed()
+{
+    sliderPressed = true;
+}
+
+void MainWindow::on_vslSpeed_sliderReleased()
+{
+    sliderPressed = false;
 }
